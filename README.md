@@ -6,9 +6,9 @@ A SQL-based analysis of early readmission among patients with diabetes across 13
 
 ## Executive Summary
 
-This project analyzes the **Diabetes 130-US Hospitals for Years 1999-2008** dataset to identify encounter-level characteristics associated with **readmission within 30 days**. After retaining each patient's first recorded encounter and excluding discharge dispositions where subsequent readmission was not a meaningful outcome, the analytic cohort contained **69,973 patients**. Of these, **6,277 (9.0%)** were readmitted within 30 days.
+This project analyzes the **Diabetes 130-US Hospitals for Years 1999-2008** dataset to identify encounter-level characteristics associated with readmission within 30 days. After retaining each patient's first recorded encounter and excluding discharge dispositions where subsequent readmission was not a meaningful outcome, the analytic cohort contained **69,973 patients**. Of these, **6,277 (9.0%)** were readmitted within 30 days.
 
-The strongest descriptive signal was **prior inpatient utilization**: patients with **3+ prior inpatient visits had a 26.5% 30-day readmission rate versus 8.1% among patients with no prior inpatient visits** — an absolute difference of **18.3 percentage points** and a **3.26x relative rate**. Discharge destination showed an equally important risk gradient: patients discharged to a rehabilitation facility had a **26.3%** readmission rate compared with **6.9%** among patients discharged home.
+The strongest descriptive signal was **prior inpatient utilization**: patients with 3+ prior inpatient visits had a **26.5% 30-day readmission rate** versus **8.1%** among patients with no prior inpatient visits — an absolute difference of **18.3 percentage points** and a **3.26x relative rate**. Discharge destination showed an equally important risk gradient: patients discharged to a rehabilitation facility had a **26.3%** readmission rate compared with **6.9%** among patients discharged home.
 
 These findings suggest that a practical readmission surveillance workflow should prioritize **recent healthcare utilization and post-acute discharge needs first**, then use length of stay, age, medication burden, and diagnostic complexity as secondary escalation signals.
 
@@ -16,7 +16,7 @@ These findings suggest that a practical readmission surveillance workflow should
 
 Thirty-day readmission is an important quality and utilization metric because early returns to the hospital may reflect disease severity, gaps in care transitions, incomplete follow-up, or complex social and clinical needs. In current U.S. policy, CMS reduces payments to eligible hospitals with excess risk-standardized readmissions for specific conditions and procedures through the Hospital Readmissions Reduction Program (HRRP).
 
-This dataset is **not a direct HRRP performance file**, and diabetes itself is not one of the six conditions/procedures currently used in the core HRRP measures. The business question here is therefore broader:
+This dataset is not a direct HRRP performance file, and diabetes itself is not one of the six conditions/procedures currently used in the core HRRP measures. The business question here is therefore broader:
 
 > **Which observable characteristics of a diabetes hospitalization are most useful for identifying patients with elevated risk of returning within 30 days?**
 
@@ -34,8 +34,7 @@ The goal is to surface patterns that could help inform care-management prioritiz
   - `<30` = readmitted within 30 days
   - `>30` = readmitted after 30 days
   - `NO` = no recorded readmission
-- **License:** CC BY 4.0
-- **UCI DOI:** https://doi.org/10.24432/C5230J
+- **Data Source:** https://doi.org/10.24432/C5230J
 
 ### Analytic Cohort Construction
 
@@ -46,7 +45,7 @@ The goal is to surface patterns that could help inform care-management prioritiz
 | Exclude hospice, expired/deceased, and invalid discharge dispositions | 69,973 | -1,545 patients |
 | Final 30-day readmission events | 6,277 | 9.0% of analytic cohort |
 
-The first-encounter restriction reduces repeated-patient bias in descriptive comparisons, but it also means this analysis does **not** model recurrent admissions over time.
+The first-encounter restriction reduces repeated-patient bias in descriptive comparisons, but it also means this analysis does not model recurrent admissions over time.
 
 ### Missingness
 
@@ -58,27 +57,27 @@ Placeholder values (`?`) were converted to SQL `NULL` values before analysis. Se
 | Medical specialty | 49.1% |
 | Payer code | 39.6% |
 
-Because weight was missing in nearly the entire dataset, it was **not used as a core risk signal**. High-missingness variables were treated cautiously rather than imputed without a defensible clinical basis.
+Because weight was missing in nearly the entire dataset, it was not used as a core risk signal. High-missingness variables were treated cautiously rather than imputed without a defensible clinical basis.
 
 ## Methodology
 
 The SQL workflow is organized into three stages:
 
 1. **Database setup**
-   - Created the project database.
-   - Built lookup tables for coded admission/discharge fields.
+   - Created the project database
+   - Built lookup tables for coded admission/discharge fields
 
 2. **Data cleaning and cohort construction**
-   - Standardized missing-value placeholders.
-   - Retained the first encounter per patient.
-   - Excluded discharge dispositions incompatible with meaningful readmission follow-up.
-   - Created `age_midpoint`.
-   - Created a binary `is_readmitted_30` outcome.
+   - Standardized missing-value placeholders
+   - Retained the first encounter per patient
+   - Excluded discharge dispositions incompatible with meaningful readmission follow-up
+   - Created `age_midpoint`
+   - Created a binary `is_readmitted_30` outcome
 
 3. **Readmission analysis**
-   - Established the overall 30-day readmission baseline.
-   - Compared readmission across age, admission type, discharge disposition, length of stay, prior utilization, medication burden, diagnosis complexity, primary diagnosis, lab intensity, medication changes, and A1C testing.
-   - Used CTEs, `CASE`, conditional aggregation, joins, `RANK()`, and `NTILE()` to build interpretable analytic groups.
+   - Established the overall 30-day readmission baseline
+   - Compared readmission across age, admission type, discharge disposition, length of stay, prior utilization, medication burden, diagnosis complexity, primary diagnosis, lab intensity, medication changes, and A1C testing
+   - Used CTEs, `CASE`, conditional aggregation, joins, `RANK()`, and `NTILE()` to build interpretable analytic groups
 
 ## Key Results
 
@@ -95,9 +94,9 @@ Patients with **3+ prior inpatient visits** were readmitted within 30 days at **
 
 The same pattern appears when prior utilization is summarized continuously. Patients who were readmitted within 30 days averaged:
 
-- **0.37 prior inpatient visits** vs **0.16** among those not readmitted.
-- **0.15 prior emergency visits** vs **0.10**.
-- **0.31 prior outpatient visits** vs **0.28**.
+- **0.37 prior inpatient visits** vs **0.16** among those not readmitted
+- **0.15 prior emergency visits** vs **0.10**
+- **0.31 prior outpatient visits** vs **0.28**
 
 Prior inpatient use stands out: the readmitted group had roughly **2.34x** the average prior inpatient utilization of the non-readmitted group.
 
@@ -234,11 +233,11 @@ Patients with repeated prior admissions showed the largest and most consistent u
 
 ### 2. Add transition-of-care intensity to the risk screen
 Patients discharged to rehabilitation, skilled nursing, another hospital, or other inpatient care settings had markedly higher readmission rates than patients discharged home. These groups are logical candidates for:
-- early post-discharge contact,
-- medication reconciliation,
-- appointment confirmation,
-- transfer-document completeness checks,
-- and care-manager handoffs.
+- early post-discharge contact
+- medication reconciliation
+- appointment confirmation
+- transfer-document completeness checks
+- and care-manager handoffs
 
 ### 3. Use length of stay and medication burden as secondary escalation factors
 Long stays and high medication burden were associated with higher readmission, but their gradients were smaller than those of prior utilization and discharge destination. They are best used to **refine**, not replace, the primary risk screen.
@@ -248,11 +247,11 @@ The unadjusted differences for A1C testing and medication-change status were sma
 
 ### 5. Validate a combined risk rule before deployment
 A practical next step would be to test whether a simple rule combining:
-- prior inpatient utilization,
-- discharge destination,
-- length of stay,
-- age,
-- medication burden,
+- prior inpatient utilization
+- discharge destination
+- length of stay
+- age
+- medication burden
 - and diagnosis complexity
 
 improves sensitivity and positive predictive value over any single factor alone.
