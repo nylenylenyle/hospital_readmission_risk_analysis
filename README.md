@@ -258,7 +258,7 @@ improves sensitivity and positive predictive value over any single factor alone.
 
 ## Technical Skills Demonstrated
 
-- **MySQL**
+- MySQL
 - CTEs
 - `CASE`-based feature engineering
 - Window functions: `RANK()` and `NTILE()`
@@ -274,43 +274,27 @@ improves sensitivity and positive predictive value over any single factor alone.
 
 ```text
 hospital-readmissions/
-├── 01_database_setup.sql
-├── 02_data_cleaning.sql
-├── 03_readmission_analysis.sql
 ├── README.md
-└── assets/
-    ├── prior_inpatient_readmission.png
-    ├── discharge_destination_readmission.png
-    ├── length_of_stay_readmission.png
-    └── diagnosis_category_readmission.png
+├── assets/
+│   ├── diagnosis_category_readmission.png
+│   ├── discharge_destination_readmission.png
+│   ├── length_of_stay_readmission.png
+│   └── prior_inpatient_readmission.png
+└── scripts/
+    ├── 01_database_setup.sql
+    ├── 02_data_cleaning.sql
+    └── 03_readmission_analysis.sql
 ```
 
 ## Limitations
 
-- This is an **observational, descriptive analysis**. Associations should not be interpreted as causal effects.
-- The dataset covers **1999-2008**, so treatment patterns and hospital practices may not reflect current care.
-- The analysis intentionally retains only the **first encounter per patient**, which improves patient-level independence but discards longitudinal information from subsequent encounters.
-- The dataset does not support a hospital-level performance comparison in this project.
+- This is an observational, descriptive analysis. Associations should not be interpreted as causal effects.
+- The dataset covers 1999-2008, so treatment patterns and hospital practices may not reflect current care.
+- The analysis intentionally retains only the first encounter per patient, which improves patient-level independence but discards longitudinal information from subsequent encounters.
 - Important variables have substantial missingness, especially weight, medical specialty, and payer code.
 - Discharge disposition, length of stay, medication burden, and laboratory intensity may act as proxies for underlying illness severity.
 - Diagnosis categories are broad ICD-9 groupings based only on the primary diagnosis.
-- The `NTILE(3)` medication analysis is distribution-based rather than clinically threshold-based; tied medication counts can fall on a bucket boundary.
-- The results are **not risk-adjusted**. A multivariable model is needed to determine which factors remain independently associated with readmission.
 
 ## Next Steps
 
-A stronger second phase would move from descriptive SQL analysis to **multivariable risk modeling**:
-
-1. Fit a logistic regression model for 30-day readmission.
-2. Estimate adjusted odds ratios and confidence intervals.
-3. Compare model discrimination using ROC-AUC and precision-recall metrics.
-4. Evaluate calibration across risk deciles.
-5. Test interactions between prior utilization, discharge destination, age, and medication burden.
-6. Compare a simple operational rule against a statistical model.
-7. If repeated encounters are retained, use a patient-aware train/test split to prevent leakage.
-
-## References
-
-- Clore J, Cios K, DeShazo J, Strack B. *Diabetes 130-US Hospitals for Years 1999-2008*. UCI Machine Learning Repository. DOI: https://doi.org/10.24432/C5230J
-- UCI dataset page: https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008
-- CMS Hospital Readmissions Reduction Program: https://www.cms.gov/medicare/quality/value-based-programs/hospital-readmissions
+A stronger next step would be to build a model that looks at several risk factors at the same time instead of analyzing each one separately.
